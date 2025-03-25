@@ -42,6 +42,7 @@ def create_mouse_movement_image(points):
         img[y, x] = 1
     return img
 
+# Following the chaotic permutation algorithm from the paper
 def chaotic_permute(img, rounds=9):
     flat = img.flatten()
     size = flat.size
@@ -57,6 +58,12 @@ def chaotic_permute(img, rounds=9):
     
     return flat.reshape(GRID_SIZE, GRID_SIZE)
 
+'''
+Extraction Algorithm:
+1. Divide the image into 256 blocks of 4x4 pixels
+2. Count the number of points with black colour inside a block. If the count is odd, the block is assigned a value of 1, otherwise the block is assigned 0.
+3. Scan those 256 blocks from top to down and from left to right, concatenating the value assigned to each block to compose the 256-bit random number
+'''
 def extract_256_bits(img):
     bits = []
     for y in range(0, GRID_SIZE, BLOCK_SIZE):
@@ -64,7 +71,9 @@ def extract_256_bits(img):
             block = img[y:y+BLOCK_SIZE, x:x+BLOCK_SIZE]
             count = np.sum(block)
             bits.append(1 if count % 2 == 1 else 0)
-    return bits[:256]
+
+    return bits[:256] # ensures 256 bits
+   
 
 def main():
 
@@ -82,7 +91,8 @@ def main():
             random_bits = extract_256_bits(encrypted_image)
 
             bit_str = ''.join(str(b) for b in random_bits)
-            hex_str = f'{int(bit_str, 2):064x}'
+            bit_number = int(bit_str, 2)
+            hex_str = hex(bit_number)
 
             print(f"Random 256-bit number:\n{hex_str}\n")
 
