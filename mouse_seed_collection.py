@@ -1,8 +1,7 @@
 import numpy as np
-import cv2
 from pynput import mouse
-import time
-import random
+
+# Citation: A True Random Number Generator Based on Mouse Movement and Chaotic Cryptography
 
 GRID_SIZE = 64
 BLOCK_SIZE = 4
@@ -10,7 +9,8 @@ MIN_POINTS = 256
 MAX_POINTS = 1024
 FILENAME = "mouse_seed.txt"
 
-def capture_mouse_movement():
+# Function to capture mouse movement
+def get_mouse_movement():
     points = []
 
     def on_move(x, y):
@@ -18,25 +18,25 @@ def capture_mouse_movement():
             return False  # Stop listening
         points.append((x, y))
 
-    print("Move your mouse randomly...")
-    with mouse.Listener(on_move=on_move) as listener:
-        listener.join()
+    with mouse.Listener(on_move=on_move) as mouse_listener:
+        mouse_listener.join()
 
     return points
 
+# Normalize the points to a 64x64 grid
 def normalize_points(points):
-    xs, ys = zip(*points)
-    min_x, min_y = min(xs), min(ys)
-    max_x, max_y = max(xs), max(ys)
+    x_coord, y_coord = zip(*points)
+    min_x, min_y = min(x_coord), min(y_coord)
+    max_x, max_y = max(x_coord), max(y_coord)
 
-    normalized = []
+    normalized_coordinates = []
     for x, y in points:
         nx = int((x - min_x) / (max_x - min_x + 1e-9) * (GRID_SIZE - 1))
         ny = int((y - min_y) / (max_y - min_y + 1e-9) * (GRID_SIZE - 1))
-        normalized.append((nx, ny))
-    return normalized
+        normalized_coordinates.append((nx, ny))
+    return normalized_coordinates
 
-def create_image(points):
+def create_mouse_movement_image(points):
     img = np.zeros((GRID_SIZE, GRID_SIZE), dtype=np.uint8)
     for x, y in points:
         img[y, x] = 1
@@ -45,15 +45,16 @@ def create_image(points):
 def chaotic_permute(img, rounds=9):
     flat = img.flatten()
     size = flat.size
-    seed = int(np.sum(flat)) % size
-    x = 0.31
-    for r in range(rounds):
+    x = 0.31  # initial value stated in the paper
+
+    for _ in range(rounds):
         indices = []
         for _ in range(size):
             x = 4 * x * (1 - x)
             idx = int(x * size) % size
             indices.append(idx)
         flat = flat[indices]
+    
     return flat.reshape(GRID_SIZE, GRID_SIZE)
 
 def extract_256_bits(img):
@@ -66,18 +67,17 @@ def extract_256_bits(img):
     return bits[:256]
 
 def main():
-    print("Press Ctrl+C to stop...\n")
 
     try:
         while True:
-            points = capture_mouse_movement()
+            points = get_mouse_movement()
 
             if len(points) < MIN_POINTS:
-                print("Not enough points collected. Skipping...\n")
+                print("Not enough points collected.\n")
                 continue
 
             norm_points = normalize_points(points)
-            image = create_image(norm_points)
+            image = create_mouse_movement_image(norm_points)
             encrypted_image = chaotic_permute(image, rounds=9)
             random_bits = extract_256_bits(encrypted_image)
 
@@ -90,7 +90,7 @@ def main():
                 file.write(hex_str + "\n")
 
     except KeyboardInterrupt:
-        print("\nStopped by user. Random numbers saved to", FILENAME)
+        print("\nRandom numbers saved to", FILENAME)
 
 if __name__ == "__main__":
     main()

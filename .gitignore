@@ -6,3 +6,6 @@ obj/
 # Compiled target executable files
 ramulator
 .gitattributes
+
+# venv
+venv/
