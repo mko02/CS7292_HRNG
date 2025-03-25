@@ -1,5 +1,9 @@
 import numpy as np
 from pynput import mouse
+from collections import Counter
+import math
+import argparse
+import os
 
 # Citation: A True Random Number Generator Based on Mouse Movement and Chaotic Cryptography
 
@@ -73,10 +77,43 @@ def extract_256_bits(img):
             bits.append(1 if count % 2 == 1 else 0)
 
     return bits[:256] # ensures 256 bits
-   
 
+def calculate_entropy():
+
+    random_numbers = []
+    with open(FILENAME, "r") as file:
+        for line in file:
+            random_numbers.append(line.strip())
+
+    count = Counter(random_numbers)
+    total = len(random_numbers)
+
+    entropy = 0
+    for frequency in count.values():
+        probability = frequency / total
+        entropy -= probability * math.log2(probability)
+
+    max_entropy = math.log2(len(count))
+
+    return entropy, max_entropy
+   
 def main():
 
+    # if we use the -e flag, we calculate the entropy of the random numbers
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e", "--entropy", action="store_true")
+    args = parser.parse_args()
+
+    if args.entropy:
+        if not os.path.exists(FILENAME):
+            print("No random numbers collected.")
+            return
+
+        entropy, max_entropy = calculate_entropy()
+        print(f"Entropy of random numbers: {entropy:.3f}")
+        print(f"Maximum entropy: {max_entropy:.3f}")
+        return
+    
     try:
         while True:
             points = get_mouse_movement()
@@ -92,7 +129,7 @@ def main():
 
             bit_str = ''.join(str(b) for b in random_bits)
             bit_number = int(bit_str, 2)
-            hex_str = hex(bit_number)
+            hex_str = f'{bit_number:064x}'
 
             print(f"Random 256-bit number:\n{hex_str}\n")
 
