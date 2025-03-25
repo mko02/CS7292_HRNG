@@ -29,6 +29,9 @@
 #include "STTMRAM.h"
 #include "PCM.h"
 
+// HRNG
+#include "TRNG_reader.h"
+
 using namespace std;
 using namespace ramulator;
 
@@ -220,6 +223,10 @@ int main(int argc, const char *argv[])
 
     std::vector<const char*> files(&argv[trace_start], &argv[argc]);
     configs.set_core_num(argc - trace_start);
+
+    std::vector<uint64_t> trng_seed = read_TRNG_seed("./TRNG_seed.txt");
+    std:uint64_t current_seed = trng_seed[0];
+    std::cout << "Loaded TRNG seed. Current Seed: " << current_seed << std::endl;
 
     if (standard == "DDR3") {
       DDR3* ddr3 = new DDR3(configs["org"], configs["speed"]);
