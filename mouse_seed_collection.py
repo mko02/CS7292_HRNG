@@ -99,6 +99,8 @@ def calculate_entropy():
    
 def main():
 
+    count = 0
+
     # if we use the -e flag, we calculate the entropy of the random numbers
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--entropy", action="store_true")
@@ -122,22 +124,10 @@ def main():
                 print("Not enough points collected.\n")
                 continue
 
-            norm_points = normalize_points(points)
-            image = create_mouse_movement_image(norm_points)
-            encrypted_image = chaotic_permute(image, rounds=9)
-            random_bits = extract_256_bits(encrypted_image)
-
-            bit_str = ''.join(str(b) for b in random_bits)
-            bit_number = int(bit_str, 2)
-            hex_str = f'{bit_number:064x}'
-
-            print(f"Random 256-bit number:\n{hex_str}\n")
-
-            with open(FILENAME, "a") as file:
-                file.write(hex_str + "\n")
-
+            norm_points = normalize_points(points), b1hat
     except KeyboardInterrupt:
         print("\nRandom numbers saved to", FILENAME)
+        print("Total random numbers generated:", count)
 
 if __name__ == "__main__":
     main()

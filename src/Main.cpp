@@ -30,7 +30,8 @@
 #include "PCM.h"
 
 // HRNG
-#include "TRNG_reader.h"
+#include "TRNGReader.h"
+#include "ChaCha20.h"
 
 using namespace std;
 using namespace ramulator;
@@ -225,9 +226,21 @@ int main(int argc, const char *argv[])
     configs.set_core_num(argc - trace_start);
 
     // HRNG
-    std::vector<uint64_t> trng_seed = read_TRNG_seed("./TRNG_seed.txt");
-    std:uint64_t current_seed = trng_seed[0];
-    std::cout << "Loaded TRNG seed. Current Seed: " << current_seed << std::endl;
+    TRNGReader trng("./TRNG_seed.txt");
+
+    auto key = trng.getBytes(32);
+    auto nonce = trng.getBytes(12);
+
+    ChaCha20 cipher(key, nonce, 1);
+
+    std::string plaintext = "Testing plaintext";
+    std::vector<uint8_t> data(plaintext.begin(), plaintext.end());
+
+    cipher.encrypt(data.data(), data.size());
+
+    std::cout << "Encrypted: ";
+    for (uint8_t b : data) printf("%02x ", b);
+    std::cout << std::endl;
 
     if (standard == "DDR3") {
       DDR3* ddr3 = new DDR3(configs["org"], configs["speed"]);
