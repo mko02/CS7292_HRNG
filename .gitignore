@@ -9,3 +9,5 @@ ramulator
 
 # venv
 venv/
+
+.vscode/
