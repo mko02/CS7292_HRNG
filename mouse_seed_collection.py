@@ -11,7 +11,7 @@ GRID_SIZE = 64
 BLOCK_SIZE = 4
 MIN_POINTS = 256
 MAX_POINTS = 1024
-FILENAME = "mouse_seed.txt"
+FILENAME = "TRNG_seed.txt"
 
 # Function to capture mouse movement
 def get_mouse_movement():
@@ -124,7 +124,22 @@ def main():
                 print("Not enough points collected.\n")
                 continue
 
-            norm_points = normalize_points(points), b1hat
+            norm_points = normalize_points(points)
+            image = create_mouse_movement_image(norm_points)
+            encrypted_image = chaotic_permute(image, rounds=9)
+            random_bits = extract_256_bits(encrypted_image)
+
+            bit_str = ''.join(str(b) for b in random_bits)
+            bit_number = int(bit_str, 2)
+            hex_str = f'{bit_number:064x}'
+
+            print(f"Random 256-bit number:\n{hex_str}\n")
+
+            with open(FILENAME, "a") as file:
+                file.write(hex_str + "\n")
+
+            count += 1
+    
     except KeyboardInterrupt:
         print("\nRandom numbers saved to", FILENAME)
         print("Total random numbers generated:", count)
