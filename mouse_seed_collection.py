@@ -11,7 +11,7 @@ GRID_SIZE = 64
 BLOCK_SIZE = 4
 MIN_POINTS = 256
 MAX_POINTS = 1024
-FILENAME = "mouse_seed.txt"
+FILENAME = "TRNG_seed.txt"
 
 # Function to capture mouse movement
 def get_mouse_movement():
