@@ -15,6 +15,11 @@ public:
     // Returns the next `num_bytes` from blocks
     std::vector<uint8_t> getBytes(size_t num_bytes);
 
+    // Latency to get TRNG bytes
+    int latency() const {
+        return 10;
+    }
+
 private:
     std::vector<uint8_t> blocks;
     static inline size_t index = 0;  // Shared static counter

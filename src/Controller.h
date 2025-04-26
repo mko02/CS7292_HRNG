@@ -64,6 +64,8 @@ protected:
     TRNGReader* trng_reader = nullptr;
     ChaCha20* csprng = nullptr;
     bool enable_hrng = true;
+    int reads_since_reseed = 0;
+    int reseed_interval = 1000; // number of reads 
 
 #ifndef INTEGRATED_WITH_GEM5
     VectorStat record_read_hits;
@@ -134,11 +136,16 @@ public:
         }
 
         // HRNG
+        reseed_interval = 1000;
+        reads_since_reseed = 0;
         enable_hrng = configs["enable_hrng"] == "true" || configs["enable_hrng"] == "on";
+
         trng_reader = new TRNGReader("./TRNG_seed.txt");
         std::vector<uint8_t> key = trng_reader->getBytes(32);
         std::vector<uint8_t> nonce = trng_reader->getBytes(12);
         csprng = new ChaCha20(key, nonce, 0);
+
+        read_latency_sum += trng_reader->latency();
 
         // regStats
 

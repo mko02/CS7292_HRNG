@@ -13,6 +13,11 @@ public:
     ChaCha20(const std::vector<uint8_t>& key, const std::vector<uint8_t>& nonce, uint32_t counter = 0);
     void encrypt(uint8_t* data, size_t length);
 
+    // latency to generate random number
+    int latency() const {
+        return 5;
+    }
+
 private:
     // 256-bit key, a 32-bit counter, a 96-bit nonce
     std::array<uint8_t, 32> key;  // 32 * 8 = 256
