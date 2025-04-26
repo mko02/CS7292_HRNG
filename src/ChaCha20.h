@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <stdexcept>
 
+// HRNG
+
 class ChaCha20 {
 public:
     ChaCha20(const std::vector<uint8_t>& key, const std::vector<uint8_t>& nonce, uint32_t counter = 0);

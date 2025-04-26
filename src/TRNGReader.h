@@ -5,6 +5,8 @@
 #include <string>
 #include <cstdint>
 
+// HRNG
+
 class TRNGReader {
 public:
     // read the TRNG seed file and add them to the blocks

@@ -5,3 +5,10 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+
+To run the code
+
+```bash
+make -j
+./ramulator configs/TLDRAM-config.cfg --mode=dram dram.trace
+```

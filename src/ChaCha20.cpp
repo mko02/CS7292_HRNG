@@ -4,6 +4,8 @@
 #include "ChaCha20.h"
 #include <cstring>
 
+// HRNG
+
 ChaCha20::ChaCha20(const std::vector<uint8_t>& keyInput, const std::vector<uint8_t>& nonceInput, uint32_t counter)
 {
     // check for input to ensure size is valid
