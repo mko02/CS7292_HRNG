@@ -3,6 +3,10 @@
 
 #include "ChaCha20.h"
 #include <cstring>
+#include <fstream>
+#include <iomanip>
+
+// HRNG
 
 ChaCha20::ChaCha20(const std::vector<uint8_t>& keyInput, const std::vector<uint8_t>& nonceInput, uint32_t counter)
 {
@@ -33,6 +37,18 @@ void ChaCha20::encrypt(uint8_t* plaintext, size_t length) {
 
         offset += blockSize;
     }
+
+    // write the newly encrypted data to a file "encrypted.txt"
+
+    std::ofstream outfile;
+    outfile.open("CSPRNG.txt", std::ios_base::app);
+
+    for (size_t i = 0; i < length; ++i) {
+        outfile << std::hex << (int)plaintext[i];
+    }
+
+    outfile << std::endl;
+    outfile.close();
 }
 
 // Rotate left function

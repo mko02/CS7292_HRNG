@@ -226,21 +226,21 @@ int main(int argc, const char *argv[])
     configs.set_core_num(argc - trace_start);
 
     // HRNG
-    TRNGReader trng("./TRNG_seed.txt");
+    // TRNGReader trng("./TRNG_seed.txt");
 
-    auto key = trng.getBytes(32);
-    auto nonce = trng.getBytes(12);
+    // auto key = trng.getBytes(32);
+    // auto nonce = trng.getBytes(12);
 
-    ChaCha20 cipher(key, nonce, 1);
+    // ChaCha20 cipher(key, nonce, 1);
 
-    std::string plaintext = "Testing plaintext";
-    std::vector<uint8_t> data(plaintext.begin(), plaintext.end());
+    // std::string plaintext = "Testing plaintext";
+    // std::vector<uint8_t> data(plaintext.begin(), plaintext.end());
 
-    cipher.encrypt(data.data(), data.size());
+    // cipher.encrypt(data.data(), data.size());
 
-    std::cout << "Encrypted: ";
-    for (uint8_t b : data) printf("%02x ", b);
-    std::cout << std::endl;
+    // std::cout << "Encrypted: ";
+    // for (uint8_t b : data) printf("%02x ", b);
+    // std::cout << std::endl;
 
     if (standard == "DDR3") {
       DDR3* ddr3 = new DDR3(configs["org"], configs["speed"]);

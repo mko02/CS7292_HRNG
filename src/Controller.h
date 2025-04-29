@@ -20,6 +20,10 @@
 #include "SALP.h"
 #include "TLDRAM.h"
 
+// HRNG
+#include "TRNGReader.h"
+#include "ChaCha20.h"
+
 using namespace std;
 
 namespace ramulator
@@ -55,6 +59,17 @@ protected:
     ScalarStat read_req_queue_length_sum;
     ScalarStat write_req_queue_length_avg;
     ScalarStat write_req_queue_length_sum;
+
+    // HRNG
+    TRNGReader* trng_reader = nullptr;
+    ChaCha20* csprng = nullptr;
+    bool enable_hrng = true;
+
+    // assuming that TRNG generation takes 1 ms, it would require 800,000 cycles
+    // the TRNG paper says generation takes 78 ms, so theoretically, it would require 62,500,000 cycles
+    // but the paper includes the image generation, which we did not need, since we did a simple matrix
+    int reads_since_reseed = 0;
+    int reseed_interval = 800000; // number of reads 
 
 #ifndef INTEGRATED_WITH_GEM5
     VectorStat record_read_hits;
@@ -123,6 +138,18 @@ public:
             for (unsigned int i = 0; i < channel->children.size(); i++)
                 cmd_trace_files[i].open(prefix + to_string(i) + suffix);
         }
+
+        // HRNG
+        reseed_interval = 1000;
+        reads_since_reseed = 0;
+        enable_hrng = configs["enable_hrng"] == "true" || configs["enable_hrng"] == "on";
+
+        trng_reader = new TRNGReader("./TRNG_seed.txt");
+        std::vector<uint8_t> key = trng_reader->getBytes(32);
+        std::vector<uint8_t> nonce = trng_reader->getBytes(12);
+        csprng = new ChaCha20(key, nonce, 0);
+
+        read_latency_sum += trng_reader->latency();
 
         // regStats
 
@@ -286,6 +313,10 @@ public:
         delete rowtable;
         delete channel;
         delete refresh;
+
+        // HRNG
+        delete trng_reader;
+        delete csprng;
         for (auto& file : cmd_trace_files)
             file.close();
         cmd_trace_files.clear();

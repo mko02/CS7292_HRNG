@@ -6,10 +6,18 @@
 #include <cstdint>
 #include <stdexcept>
 
+// HRNG
+
 class ChaCha20 {
 public:
     ChaCha20(const std::vector<uint8_t>& key, const std::vector<uint8_t>& nonce, uint32_t counter = 0);
     void encrypt(uint8_t* data, size_t length);
+
+    // latency to generate random number
+    // latency only from this: https://github.com/secworks/chacha
+    int latency() const {
+        return 23;
+    }
 
 private:
     // 256-bit key, a 32-bit counter, a 96-bit nonce

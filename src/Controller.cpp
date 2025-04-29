@@ -139,7 +139,38 @@ void Controller<TLDRAM>::tick(){
 
     /*** 5. Change a read request to a migration request ***/
     if (req->type == Request::Type::READ) {
-        req->type = Request::Type::EXTENSION;
+        // HRNG
+
+        if (enable_hrng) {
+            uint8_t buffer[64] = {0};
+            csprng->encrypt(buffer, sizeof(buffer));
+
+            std::cout << "[HRNG] ChaCha20 RNG: ";
+            for (int i = 0; i < 8; ++i) {
+                printf("%02x", buffer[i]);
+            }
+            std::cout << std::endl;
+
+            // latency to generate random number
+            read_latency_sum += csprng->latency();
+
+            // increment the reseed counter
+            reads_since_reseed++;
+
+            // check for reseed interval
+            if (reads_since_reseed >= reseed_interval) {
+                std::cout << "[HRNG] Reseeding..." << std::endl;
+
+                std::vector<uint8_t> new_key = trng_reader->getBytes(32);
+                std::vector<uint8_t> new_nonce = trng_reader->getBytes(12);
+
+                delete csprng;
+                csprng = new ChaCha20(new_key, new_nonce, 0);
+                reads_since_reseed = 0; 
+
+                read_latency_sum += trng_reader->latency();
+            }
+        }
     }
 
     // issue command on behalf of request
