@@ -12,3 +12,5 @@ To run the code
 make -j
 ./ramulator configs/TLDRAM-config.cfg --mode=dram dram.trace
 ```
+
+To turn on/off hrng, update the enable_hrng flag in TLDRAM-config.cfg
