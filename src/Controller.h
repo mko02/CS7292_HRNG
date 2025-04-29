@@ -64,8 +64,12 @@ protected:
     TRNGReader* trng_reader = nullptr;
     ChaCha20* csprng = nullptr;
     bool enable_hrng = true;
+
+    // assuming that TRNG generation takes 1 ms, it would require 800,000 cycles
+    // the TRNG paper says generation takes 78 ms, so theoretically, it would require 62,500,000 cycles
+    // but the paper includes the image generation, which we did not need, since we did a simple matrix
     int reads_since_reseed = 0;
-    int reseed_interval = 1000; // number of reads 
+    int reseed_interval = 800000; // number of reads 
 
 #ifndef INTEGRATED_WITH_GEM5
     VectorStat record_read_hits;

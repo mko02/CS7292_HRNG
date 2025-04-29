@@ -14,8 +14,9 @@ public:
     void encrypt(uint8_t* data, size_t length);
 
     // latency to generate random number
+    // latency only from this: https://github.com/secworks/chacha
     int latency() const {
-        return 5;
+        return 23;
     }
 
 private:
