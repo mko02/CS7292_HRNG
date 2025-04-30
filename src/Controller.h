@@ -64,6 +64,7 @@ protected:
     TRNGReader* trng_reader = nullptr;
     ChaCha20* csprng = nullptr;
     bool enable_hrng = true;
+    bool enable_reseeding = true;
 
     // assuming that TRNG generation takes 1 ms, it would require 800,000 cycles
     // the TRNG paper says generation takes 78 ms, so theoretically, it would require 62,500,000 cycles
@@ -143,6 +144,7 @@ public:
         reseed_interval = 1000;
         reads_since_reseed = 0;
         enable_hrng = configs["enable_hrng"] == "true" || configs["enable_hrng"] == "on";
+        enable_reseeding = configs["enable_reseeding"] == "true" || configs["enable_reseeding"] == "on";
 
         trng_reader = new TRNGReader("./TRNG_seed.txt");
         std::vector<uint8_t> key = trng_reader->getBytes(32);
