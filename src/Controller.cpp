@@ -145,11 +145,11 @@ void Controller<TLDRAM>::tick(){
             uint8_t buffer[64] = {0};
             csprng->encrypt(buffer, sizeof(buffer));
 
-            std::cout << "[HRNG] ChaCha20 RNG: ";
-            for (int i = 0; i < 8; ++i) {
-                printf("%02x", buffer[i]);
-            }
-            std::cout << std::endl;
+            // std::cout << "[HRNG] ChaCha20 RNG: ";
+            // for (int i = 0; i < 8; ++i) {
+            //     printf("%02x", buffer[i]);
+            // }
+            // std::cout << std::endl;
 
             // latency to generate random number
             read_latency_sum += csprng->latency();
@@ -158,8 +158,8 @@ void Controller<TLDRAM>::tick(){
             reads_since_reseed++;
 
             // check for reseed interval
-            if (reads_since_reseed >= reseed_interval) {
-                std::cout << "[HRNG] Reseeding..." << std::endl;
+            if (enable_reseeding && reads_since_reseed >= reseed_interval) {
+                // std::cout << "[HRNG] Reseeding..." << std::endl;
 
                 std::vector<uint8_t> new_key = trng_reader->getBytes(32);
                 std::vector<uint8_t> new_nonce = trng_reader->getBytes(12);
