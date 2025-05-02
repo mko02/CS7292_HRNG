@@ -18,3 +18,5 @@ To run the test cases we presented on the report:
 ```bash
 ./run_test.sh
 ```
+
+Please refer to the README_Ramulator for additional information.
