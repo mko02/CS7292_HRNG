@@ -1,3 +1,9 @@
+# HyRNG: Hybrid Random Number Generator with Mouse Movement TRNG Seed and In-DRAM CSPRNG for Enhanced Hardware Security
+
+## Report
+[Report](CS_7292_Project_Report.pdf)
+
+## Setup
 To make a python venv
 
 ```bash
